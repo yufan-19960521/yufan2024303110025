@@ -1,0 +1,65 @@
+# 加载必要的包
+library(ggplot2)
+library(readxl)     # 读取Excel文件
+library(patchwork)  # 组合图形
+
+
+# 读入数据
+data1 <- read_excel("data_2.xlsx", sheet = 1)
+data2 <- read_excel("data_2.xlsx", sheet = 2)
+data3 <- read_excel("data_2.xlsx", sheet = 3)
+data4 <- read_excel("data_2.xlsx", sheet = 4)
+
+
+# 图1-S1BF变量
+p1 <- ggplot(data1, aes(x = `Time (s)`)) +
+  # 误差带
+  geom_ribbon(aes(ymin = S1BF - SD, ymax = S1BF + SD), fill = "#dc96f0") +  # 误差带上下边界（均值±标准误）
+  # 均值线
+  geom_line(aes(y = S1BF, color = "S1BF"), linewidth = 0.7) +  # 设置图例标签为"S1BF"
+  # 设置颜色
+  scale_color_manual(values = "#7813f3") +   # 自定义线条颜色
+  # 调整坐标轴：固定坐标范围并设置刻度
+  scale_x_continuous(limits = c(-10, 20),              # x轴范围从-10到20
+                     breaks = seq(-10, 20, by = 5),    # 每5个单位显示一个刻度
+                     expand = c(0, 0)) +               # 坐标轴两端不扩展
+  scale_y_continuous(limits = c(3.75, 4.0),
+                     breaks = seq(3.8, 4.0, by = 0.1),
+                     expand = c(0, 0)) +
+  # Y轴名称
+  labs(y = expression(F[570]*"/"*F[595]~"Ratio")) +    # 带下标的标签
+  # 设置主题
+  theme_classic()
+  
+print(p1)
+
+
+# 图2-CA1变量
+p2 <- ggplot(data2, aes(x = `Time (s)`)) +
+  geom_ribbon(aes(ymin = CA1 - SD, ymax = CA1 + SD), fill = "#9fd4fa") +
+  geom_line(aes(y = CA1, color = "CA1"), linewidth = 0.7) +
+  scale_color_manual(values = "#1562d4") +
+  scale_x_continuous(limits = c(-10, 20),
+                     breaks = seq(-10, 20, by = 5),
+                     expand = c(0, 0))+
+  scale_y_continuous(limits = c(3.4, 3.9),
+                     breaks = seq(3.4, 3.9, by = 0.2),
+                     expand = c(0, 0)) +
+  labs(y = NULL) + 
+  theme_classic()
+
+
+print(p2)
+
+
+
+# 图3-LD变量
+p3 <- ggplot(data3, aes(x = `Time (s)`)) +
+  geom_ribbon(aes(ymin = LD - SD, ymax = LD + SD), fill = "#b0e1b7") +
+  geom_line(aes(y = LD, color = "LD"), linewidth = 0.7) +
+  scale_color_manual(values = "#1fa80c") +
+  scale_x_continuous(limits = c(-10, 20),
+                     breaks = seq(-10, 20, by = 5),
+                     expand = c(0, 0))+
+  scale_y_continuous(limits = c(3.3, 3.9),
+                     
