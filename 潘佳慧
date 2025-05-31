@@ -1,0 +1,52 @@
+# 加载必要的包
+library(ggplot2)
+library(readxl)   # 读取Excel文件
+
+# 读入数据
+data <- read_excel("data_1.xlsx")
+
+# 转换为长格式
+data_long <- data.frame(
+  time = c(data$`Time (s)`, data$`Time (s)`),
+  group = rep(c("Fasted", "4 weeks HPD"), each = nrow(data)),
+  average = c(data$Fasted_Average, data$HPD_Average),
+  SEM = c(data$Fasted_SEM, data$HPD_SEM)
+)
+
+# 定义分组的展示顺序
+data_long$group <- factor(data_long$group, levels = c("4 weeks HPD", "Fasted"))
+
+# 定义颜色
+my_color = c("#c1966b", "#642e8e")
+
+
+# 绘制时间序列图
+ggplot(data_long, aes(x = time, y = average, fill = group, color = group)) +
+  # 误差带
+  geom_ribbon(aes(ymin = average - SEM, ymax = average + SEM),  # 误差带上下边界（均值±标准误）
+              alpha = 0.2, color = NA) +                        # 透明度（20%），无边框线
+  # 均值线
+  geom_line(linewidth = 0.7) +  # 线宽
+  # 垂直参考线
+  geom_vline(xintercept = c(20, 30), linetype = "dashed", color = "grey50") +  # 在x=20和x=30处添加灰色虚线
+  # 自定义颜色
+  scale_fill_manual(values = my_color) +         # 填充色
+  scale_color_manual(values = my_color) +        # 线条色
+  # 设置图例样式
+  guides(fill = guide_legend(override.aes = list(color = my_color, fill = my_color, # 覆盖默认图例样式
+                                                 alpha = 0.3, linewidth = 0.6)), 
+         color = "none") +  # 隐藏线条颜色的图例
+  # 调整坐标轴：固定坐标范围并设置刻度
+  scale_x_continuous(limits = c(0, 50), expand = c(0, 0)) +                          # X轴范围，无扩展空间
+  scale_y_continuous(limits = c(-6, 8), breaks = seq(-6, 8, 2), expand = c(0, 0)) +  # Y轴范围，无扩展空间
+  # 坐标轴名称和标题
+  labs(x = "Time (s)", y = "ΔF/F (%)") +  # 带下标的标签
+  # 设置主题
+  theme_classic(base_size = 12) +
+  theme(axis.title = element_text(size = 11),                   # 坐标轴标题大小
+        axis.text = element_text(size = 11, color = "black"),   # 刻度标签大小和颜色
+        axis.ticks.length = unit(-3, "pt"),                     # 刻度线长度(负值表示向内)
+        legend.title = element_blank(),                         # 不显示图例标题
+        legend.text = element_text(size = 11),                  # 图例文字大小
+        legend.position = c(0.9, 0.95),                         # 图例位置(右上角)
+        legend.key.size = unit(10, 
